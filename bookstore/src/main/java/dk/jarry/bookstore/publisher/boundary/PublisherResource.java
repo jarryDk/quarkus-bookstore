@@ -2,11 +2,7 @@ package dk.jarry.bookstore.publisher.boundary;
 
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,13 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import dk.jarry.bookstore.book.entity.Book;
 import dk.jarry.bookstore.publisher.entity.Publisher;
 
-@Path("/publishers")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RestController
+@RequestMapping("/publishers")
 public class PublisherResource {
 
 	@GetMapping

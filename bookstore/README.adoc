@@ -69,3 +69,9 @@ https://quarkus.io/guides/kubernetes-guide[quarkus.io - Kubernetes Guide]
 === Hibernate orm Panache
 
 https://quarkus.io/guides/hibernate-orm-panache
+
+== ToDos
+
+OpenAPI need to find web-spring annotations
+
+https://github.com/quarkusio/quarkus/issues/4693
