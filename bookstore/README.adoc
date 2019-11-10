@@ -63,3 +63,9 @@ kubectl expose deployment postgresqldemo --type=NodePort
 ----
 
 https://quarkus.io/guides/kubernetes-guide[quarkus.io - Kubernetes Guide]
+
+== 
+
+=== Hibernate orm Panache
+
+https://quarkus.io/guides/hibernate-orm-panache

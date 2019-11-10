@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 
 import dk.jarry.bookstore.book.entity.Book;
 
-@Path("books")
+@Path("/books")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class BookResource {
@@ -28,29 +28,40 @@ public class BookResource {
 				.page(0, 100) //
 				.list();
 	}
+
+	@POST
+	@Transactional	
+	public void create(Book book) {
+		book.persist();
+	}
 	
 	@GET
 	@Path("id/{id}")
-	public Book getBookById(@PathParam("id") Long id) {
+	public Book getById(@PathParam("id") Long id) {
 		Book book = Book.findById(id);
+		if (book == null) {
+			throw new WebApplicationException( //
+					"book with id of " + id + " does not exist.", //
+					Response.Status.NOT_FOUND);
+		}
 		return book;
 	}
 	
 	@GET
 	@Path("isbn/{isbn}")
-	public Book getBookByIsbn(@PathParam("isbn") Long isbn) {
+	public Book getByIsbn(@PathParam("isbn") Long isbn) {
 		Book book = Book.find("isbn", isbn).firstResult();
+		if (book == null) {
+			throw new WebApplicationException( //
+					"book with isbn of " + isbn + " does not exist.", //
+					Response.Status.NOT_FOUND);
+		}
 		return book;
-	}
-	
-	@POST
-	@Transactional	
-	public void createBook(Book book) {
-		book.persist();
 	}
 	
 	@PUT
 	@Path("id/{id}")
+	@Transactional
 	public void updateById(@PathParam("id") Long id, Book book ) {
 		if(Book.findById(id) == null) {
 			throw new WebApplicationException( //
@@ -62,6 +73,7 @@ public class BookResource {
 	
 	@DELETE
 	@Path("id/{id}")
+	@Transactional
 	public void deleteById(@PathParam("id") Long id) {
 		Book book = Book.findById(id);
 		if(book == null) {

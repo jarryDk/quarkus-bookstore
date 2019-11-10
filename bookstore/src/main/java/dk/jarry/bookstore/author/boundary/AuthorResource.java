@@ -3,53 +3,85 @@ package dk.jarry.bookstore.author.boundary;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import javax.transaction.Transactional;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import dk.jarry.bookstore.author.entity.Author;
 
-@RestController
-@RequestMapping("/authors")
+@Path("/authors")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class AuthorResource {
 	
 	@Inject
 	AuthorService authorService;
+	
+	@GET
+	public List<Author> getAuthors() {
+		return authorService.list(
+				Long.parseLong("0"), 
+				Long.parseLong("0"));
+	}
+	
+	@POST
+	public void create(Author author) {
+		authorService.create(author);
+	}
 
-    @GetMapping
-    public List<Author> getAuthors() {
-        return authorService.list(Long.parseLong("0"), Long.parseLong("100"));
-    }
+	@GET
+	@Path("/id/{id}")
+	public Author readById(@PathParam("id") Long id) {
+		Author author = authorService.read(id);
+		if (author == null) {
+			throw new WebApplicationException( //
+					"author with id of " + id + " does not exist.", //
+					Response.Status.NOT_FOUND);
+		}
+		return author;
+	}
 
-    @PostMapping
-    public void create(Author author) {
-    	authorService.create(author);
-    }
+	@PUT
+	@Path("/id/{id}")
+	@Transactional
+	public void updateById(@PathParam("id") Long id, Author author) {
+		if (authorService.read(id) == null) {
+			throw new WebApplicationException( //
+					"author with id of " + id + " does not exist.", //
+					Response.Status.NOT_FOUND);
+		}
+		authorService.update(id, author);
+	}
+
+	@DELETE
+	@Path("/id/{id}")
+	@Transactional
+	public void deleteById(@PathParam("id") Long id) {
+		if (authorService.read(id) == null) {
+			throw new WebApplicationException( //
+					"author with id of " + id + " does not exist.", //
+					Response.Status.NOT_FOUND);
+		}
+		authorService.delete(id);
+
+	}
+
+	@GET()
+	@Path("/test")
+	public Author readForTest() {
+		Author author = new Author();
+		author.id = Long.parseLong("17");
+		return author;
+	}
+
     
-    @GetMapping(path = "/{id}" , produces = "application/json")
-    public Author readById(@PathVariable Long id) {
-        return authorService.read(id);
-    }
-    
-    @PutMapping(path = "/{id}" , produces = "application/json")
-    public void updateById(@PathVariable Long id, Author author) {
-        authorService.update(id, author);
-    }
-    
-    @DeleteMapping(path = "/{id}")
-    public void deleteById(@PathVariable Long id) {
-    	authorService.delete(id);
-    }
-    
-    @GetMapping(path = "/test" , produces = "application/json")
-    public Author readForTest(@PathVariable Long id) {
-    	Author author = new Author();
-    	author.id = id;
-        return author;
-    }
 }

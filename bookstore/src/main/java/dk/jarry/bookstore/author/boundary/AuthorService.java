@@ -79,7 +79,7 @@ public class AuthorService {
 	@Transactional
 	public List<Author> list(Long from, Long limit) {
 		return entityManager
-				.createNamedQuery("authors.findAll", Author.class)
+				.createNamedQuery("Author.findAll", Author.class)
 				.getResultList();
 	}
 
