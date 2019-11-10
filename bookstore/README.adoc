@@ -1,0 +1,65 @@
+= Bookstore
+
+
+== Before running the demo
+
+We need to be able access PostgreSQL.  
+
+*/etc/hosts*
+
+----
+127.0.0.1	postgresqldemo
+----
+
+=== Terminal
+
+We need a running PostgreSQL - local or in docker.
+
+=== Docker 
+
+==== Network
+
+*Create the network*
+[source,bash]
+----
+docker network create bookstore-net
+----
+
+*Inspect the network*
+[source,bash]
+----
+docker network inspect bookstore-net
+----
+
+https://docs.docker.com/network/network-tutorial-standalone/[docker.com - Networking with standalone containers | Docker Documentation]
+
+
+==== Run PostgreSQL on Docker
+
+First we will need a PostgreSQL database; you can launch one easily if you have Docker installed:
+
+[source,bash]
+----
+docker run --ulimit memlock=-1:-1 -it --rm=true --memory-swappiness=0 \
+	--name PostgreSQLDemo \
+	--network bookstore-net \
+	-e POSTGRES_USER=hibernate \
+	-e POSTGRES_PASSWORD=hibernate \
+	-e POSTGRES_DB=bookstore \
+	-p 5432:5432 postgres:10.5
+----
+
+=== Run PostgreSQL on Kubernetes (minikube)
+
+----
+kubectl run postgresqldemo \
+	--image=postgres:10.5 \
+	--port=5432 \
+	--env=POSTGRES_USER=hibernate \
+	--env=POSTGRES_PASSWORD=hibernate \
+	--env=POSTGRES_DB=bookstore \
+	--image-pull-policy=IfNotPresent
+kubectl expose deployment postgresqldemo --type=NodePort	
+----
+
+https://quarkus.io/guides/kubernetes-guide[quarkus.io - Kubernetes Guide]
