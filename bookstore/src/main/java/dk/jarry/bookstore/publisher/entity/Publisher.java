@@ -1,16 +1,12 @@
 package dk.jarry.bookstore.publisher.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
-public class Publisher {
-
-	@Id
-	@GeneratedValue
-	public Long id;
+public class Publisher extends PanacheEntity{
 	
-	String name;
+	public String name;
 
 }
