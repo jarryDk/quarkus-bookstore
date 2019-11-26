@@ -1,2 +1,117 @@
 = Quarkus-bookstore
 
+== Before running the demo
+
+We need to be able access PostgreSQL.  
+
+*/etc/hosts*
+
+----
+127.0.0.1	postgresqldemo
+----
+
+=== Terminal
+
+We need a running PostgreSQL - local or in docker.
+
+=== Docker 
+
+==== Network
+
+*Create the network*
+[source,bash]
+----
+docker network create bookstore
+----
+
+*Inspect the network*
+[source,bash]
+----
+docker network inspect bookstore
+----
+
+
+=== Run PostgreSQL on Docker
+
+First we will need a PostgreSQL database; you can launch one easily if you have Docker installed:
+
+[source,bash]
+----
+docker run --ulimit memlock=-1:-1 -it --rm=true \
+    --memory-swappiness=0 \
+	--name PostgreSQLDemo \
+	--network bookstore \
+	-e POSTGRES_USER=hibernate \
+	-e POSTGRES_PASSWORD=hibernate \
+	-e POSTGRES_DB=hibernate_db \
+	-p 5432:5432 postgres:10.5
+----
+
+=== Run PostgreSQL on Kubernetes (minikube)
+
+[source,bash]
+----
+minikube start \
+    -p micbn \
+    --cpus 2 \
+    --memory 2048 \
+    --disk-size 10g \
+    --vm-driver=kvm2
+----
+
+minikube dashboard --url -p micbn
+minikube stop -p micbn
+minikube delete -p micbn
+
+eval $(minikube docker-env)
+
+[source,bash]
+----
+kubectl run postgresqldemo \
+	--image=postgres:10.5 \
+	--port=5432 \
+	--env=POSTGRES_USER=hibernate \
+	--env=POSTGRES_PASSWORD=hibernate \
+	--env=POSTGRES_DB=hibernate_db \
+	--image-pull-policy=IfNotPresent
+kubectl expose deployment postgresqldemo --type=NodePort	
+----
+
+
+[source,bash]
+----
+kubectl run quarkus-bookstore \
+	--image=quarkus/bookstore \
+	--port=8080 \
+	--image-pull-policy=IfNotPresent
+kubectl expose deployment quarkus-bookstore --type=NodePort	
+----
+
+
+== OpenAPI
+
+http://localhost:8080/swagger-ui/
+
+
+== Curl
+
+[source,bash]
+----
+curl -X POST "http://localhost:8080/authors" \
+    -H  "accept: */*" \
+    -H  "Content-Type: application/json" \
+    -d "{\"name\":\"Steffen Jacobsen\"}"
+----
+
+== Commands
+
+[source,bash]
+----
+./mvnw compile quarkus:dev
+----
+
+
+[source,bash]
+----
+./mvnw package -Pnative
+----
